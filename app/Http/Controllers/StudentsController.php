@@ -9,13 +9,15 @@ class StudentsController extends Controller
 {
     public function index()
     {
-        $students = Student::with('course')->get();
+        $students = Student::with('courses')->get();
 
         return view('students.index', compact('students'));
     }
 
     public function create()
     {
+        $courses = Course::all();
+
         return view('students.create');
     }
 
@@ -28,17 +30,20 @@ class StudentsController extends Controller
             'year_level' => 'required|integer',
         ]);
 
-        Student::create($request->all()); // 'Student' instead of 'Students'
-    
+        $student = Student::create($request->only(['name', 'email', 'year_level']));
+        $student->courses()->attach($request->course);
+
         return redirect()->route('students.index')->with('success', 'Student created successfully.');
     }
 
-    public function edit(Student $student) // Use 'Student' instead of 'Students'
+    public function edit(Student $student)
     {
+        $courses = Course::all();
+
         return view('students.edit', compact('student'));
     }
 
-    public function update(Request $request, Student $student) // Use 'Student' instead of 'Students'
+    public function update(Request $request, Student $student)
     {
         $request->validate([
             'name' => 'required',
@@ -47,12 +52,13 @@ class StudentsController extends Controller
             'year_level' => 'required|integer',
         ]);
 
-        $student->update($request->all()); // 'Student' instead of 'Students'
+        $student->update($request->only(['name', 'email', 'year_level']));
+        $student->courses()->sync($request->courses);
     
         return redirect()->route('students.index')->with('success', 'Student updated successfully.');
     }
 
-    public function destroy(Student $student) // Use 'Student' instead of 'Students'
+    public function destroy(Student $student)
     {
         $student->delete();
 

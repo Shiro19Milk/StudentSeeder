@@ -13,6 +13,10 @@ class CourseSeeder extends Seeder
      */
     public function run(): void
     {
-        Course::factory()->count(5)->create();
+        $courses = ['ACT', 'BAB', 'BSIS', 'BSAIS'];
+
+        foreach ($courses as $course) {
+            Course::create(['course_name' => $course]);
+        }
     }
 }
